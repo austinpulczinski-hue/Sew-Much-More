@@ -1,0 +1,533 @@
+<title>Sew Much More Jobs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-first column; claim-ticket cards in ranked lists; bottom tab bar + floating "New job". */
+:root {
+  --bg: #F1F2F6;
+  --surface: #FFFFFF;
+  --ink: #1C2131;
+  --muted: #5E667C;
+  --line: #DADDE7;
+  --accent: #6B2E5F;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #F2E6EF;
+  --rush: #B93D0E;
+  --rush-soft: #FCE9DF;
+  --soon: #8F5B05;
+  --soon-soft: #FAF0D3;
+  --ok: #2C744F;
+  --ok-soft: #E1F1E8;
+  --shadow: 0 1px 2px rgba(28,33,49,.06), 0 2px 8px rgba(28,33,49,.05);
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #13151C; --surface: #1C1F28; --ink: #ECEDF3; --muted: #9CA3B7; --line: #2D3140;
+    --accent: #D9A0CB; --accent-ink: #26121F; --accent-soft: #392434;
+    --rush: #F4996A; --rush-soft: #3B2216; --soon: #E6C25F; --soon-soft: #342B13;
+    --ok: #6FC79C; --ok-soft: #173120; --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #13151C; --surface: #1C1F28; --ink: #ECEDF3; --muted: #9CA3B7; --line: #2D3140;
+  --accent: #D9A0CB; --accent-ink: #26121F; --accent-soft: #392434;
+  --rush: #F4996A; --rush-soft: #3B2216; --soon: #E6C25F; --soon-soft: #342B13;
+  --ok: #6FC79C; --ok-soft: #173120; --shadow: none; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 640px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px 140px; display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
+h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.01em; }
+h2 { font-size: 1.05rem; font-weight: 700; display: flex; align-items: baseline; gap: 8px; }
+h2 .count { font-family: var(--f-body); font-weight: 400; color: var(--muted); font-size: .9rem; }
+.sub { color: var(--muted); font-size: .92rem; }
+header.top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.section { display: flex; flex-direction: column; gap: 10px; }
+.hint { color: var(--muted); font-size: .88rem; margin: 0; }
+.list { display: flex; flex-direction: column; gap: 8px; }
+.empty { border: 1.5px dashed var(--line); border-radius: 12px; padding: 14px 16px; color: var(--muted); font-size: .92rem; }
+
+/* Claim ticket card */
+.ticket { display: grid; grid-template-columns: 64px 1fr; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; text-align: left; width: 100%; padding: 0; }
+.stub { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-right: 2px dashed var(--line); padding: 10px 4px; background: var(--accent-soft); }
+.stub .pos { font-family: var(--f-display); font-weight: 700; font-size: 1.35rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stub .num { font-size: .72rem; color: var(--muted); letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.ticket.rush .stub { background: var(--rush-soft); }
+.ticket.rush .stub .pos { color: var(--rush); }
+.body { padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.row1 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.name { font-weight: 700; font-size: 1.02rem; overflow-wrap: anywhere; }
+.what { color: var(--ink); font-size: .93rem; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .82rem; color: var(--muted); }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .02em; background: var(--bg); color: var(--muted); white-space: nowrap; }
+.chip.rush { background: var(--rush-soft); color: var(--rush); }
+.chip.soon { background: var(--soon-soft); color: var(--soon); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.accent { background: var(--accent-soft); color: var(--accent); }
+.qa { margin-left: auto; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: .82rem; font-weight: 700; color: var(--accent); }
+.qa:hover { background: var(--accent-soft); }
+.bal { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bal.owed { color: var(--rush); }
+
+/* Banner */
+.banner { background: var(--soon-soft); color: var(--ink); border-radius: 12px; padding: 12px 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: .92rem; }
+.banner.err { background: var(--rush-soft); }
+
+/* Buttons */
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 9px 14px; font-weight: 700; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.danger { color: var(--rush); }
+.btn.danger.armed { background: var(--rush); color: #fff; border-color: var(--rush); }
+.fab { position: fixed; right: max(16px, calc(env(safe-area-inset-right, 0px) + 16px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); background: var(--accent); color: var(--accent-ink); border: none; border-radius: 999px; padding: 14px 20px; font-weight: 700; font-size: 1rem; box-shadow: 0 6px 18px rgba(0,0,0,.18); z-index: 20; }
+
+/* Tab bar */
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); border-top: 1px solid var(--line); display: flex; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); z-index: 15; }
+nav.tabs .in { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; max-width: 640px; }
+nav.tabs button { border: none; background: none; padding: 12px 4px 14px; font-weight: 700; color: var(--muted); font-size: .95rem; border-top: 3px solid transparent; }
+nav.tabs button[aria-current="page"] { color: var(--accent); border-top-color: var(--accent); }
+
+/* Segmented / chips input */
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; font-size: .9rem; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 700; }
+.search { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); }
+
+/* Money */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.tile .k { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.tile .v { font-family: var(--f-display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tile.big { grid-column: 1 / -1; }
+.tile.big .v { font-size: 2rem; }
+.bars { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.bar { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px; align-items: center; font-size: .9rem; }
+.bar .lab { overflow-wrap: anywhere; }
+.bar .trk { height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--accent); border-radius: 6px; }
+.bar .amt { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 64px; text-align: right; }
+.bar .amt small { color: var(--muted); font-weight: 400; }
+
+/* Sheet */
+.scrim { position: fixed; inset: 0; background: rgba(10,12,18,.45); z-index: 40; display: flex; justify-content: center; align-items: flex-end; }
+.sheet { background: var(--bg); width: 100%; max-width: 640px; max-height: 92%; overflow-y: auto; border-radius: 18px 18px 0 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px calc(env(safe-area-inset-bottom, 0px) + 24px); display: flex; flex-direction: column; gap: 16px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; position: sticky; top: -16px; background: var(--bg); padding-block: 8px; z-index: 2; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label, .field > .lbl { font-weight: 700; font-size: .88rem; }
+.field input[type=text], .field input[type=tel], .field input[type=date], .field input[type=datetime-local], .field input[type=number], .field textarea, .field select { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); min-width: 0; }
+.field textarea { min-height: 72px; resize: vertical; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+.card h3 { font-size: .98rem; }
+.toggle { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.toggle input { width: 22px; height: 22px; accent-color: var(--rush); }
+.pay { display: flex; justify-content: space-between; gap: 8px; align-items: center; font-size: .92rem; padding-block: 4px; border-bottom: 1px solid var(--line); }
+.pay:last-child { border-bottom: none; }
+.pay .x { border: none; background: none; color: var(--muted); padding: 2px 6px; }
+.sumrow { display: flex; justify-content: space-between; font-weight: 700; font-variant-numeric: tabular-nums; }
+.meas { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
+.meas .field label { font-weight: 400; font-size: .8rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 140px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-weight: 700; z-index: 60; font-size: .92rem; }
+@media (max-width: 420px) { .meas { grid-template-columns: repeat(2, minmax(0,1fr)); } .bar { grid-template-columns: 80px 1fr auto; } }
+@media (prefers-reduced-motion: no-preference) { .sheet { animation: up .18s ease-out; } @keyframes up { from { transform: translateY(24px); opacity: .6; } } }
+</style>
+
+<div class="wrap" id="app">
+  <header class="top">
+    <div><h1>Sew Much More</h1><div class="sub" id="today"></div></div>
+  </header>
+  <div class="empty">Loading your jobs…</div>
+</div>
+<button class="fab" id="fab" data-action="new">+ New job</button>
+<nav class="tabs" aria-label="Sections"><div class="in">
+  <button data-tab="work" aria-current="page">Work</button>
+  <button data-tab="money">Money</button>
+  <button data-tab="all">All jobs</button>
+</div></nav>
+<div id="sheet-root"></div>
+<div id="toast-root"></div>
+
+<script>
+const TYPES = [["everyday","Everyday"],["bridal","Bridal"],["formal","Formal"],["custom","Custom"],["class","Class"]];
+const STAGES = [["booked","Booked"],["queue","Dropped off"],["working","Working on it"],["ready","Ready for pickup"],["done","Picked up"]];
+const APPTS = ["Fitting","Drop-off","Pickup","Consult","Class"];
+const METHODS = ["Cash","Card link","Venmo","Apple Pay","Zelle","Other"];
+const SOURCES = ["Facebook","Word of mouth","Google","Instagram","TikTok","Repeat client","Other"];
+const MEAS = ["Bust","Waist","Hips","Shoulder","Length","Inseam"];
+const SOON_DAYS = 3;
+const label = (list, v) => (list.find(x => x[0] === v) || [, v || ""])[1];
+
+const S = { db: null, downloads: null, jobs: [], loaded: false, offline: false, tab: "work", period: "month", filter: "active", q: "", draft: null, armed: false };
+
+// ---- dates ----
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today = () => ymd(new Date());
+const parse = s => { const [y,m,d] = s.slice(0,10).split("-").map(Number); return new Date(y, m-1, d); };
+const days = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+const fmtD = s => s ? parse(s).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) : "";
+const fmtT = s => { if (!s) return ""; const [d, t] = s.split("T"); if (!t) return fmtD(d); const [h, m] = t.split(":").map(Number); const dt = parse(d); dt.setHours(h, m); return fmtD(d) + " · " + dt.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }); };
+const money = n => "$" + (Math.round((n || 0) * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: (n % 1) ? 2 : 0, maximumFractionDigits: 2 });
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// ---- job math ----
+const paid = j => (j.payments || []).reduce((a, p) => a + (Number(p.amount) || 0), 0);
+const balance = j => (Number(j.price) || 0) - paid(j);
+const received = j => j.received || (j.createdAt || today()).slice(0, 10);
+
+// The order rule: rush first, then anything overdue or due within SOON_DAYS, then first-in-first-out.
+function rank(j, t) {
+  const due = j.due ? days(t, j.due) : Infinity;
+  const dueTxt = due < 0 ? `${-due}d overdue` : due === 0 ? "Due today" : due === 1 ? "Due tomorrow" : `Due in ${due}d`;
+  if (j.rush) return { g: 0, k: due, why: "Rush", cls: "rush", dueTxt };
+  if (due <= SOON_DAYS) return { g: 1, k: due, why: due < 0 ? "Overdue" : "Due soon", cls: due < 0 ? "rush" : "soon", dueTxt };
+  return { g: 2, k: days("2000-01-01", received(j)), why: "In line", cls: "", dueTxt };
+}
+function queueOrder(list) {
+  const t = today();
+  return list.map(j => ({ j, r: rank(j, t) }))
+    .sort((a, b) => a.r.g - b.r.g || a.r.k - b.r.k || received(a.j).localeCompare(received(b.j)) || (a.j.num || 0) - (b.j.num || 0));
+}
+
+// ---- rendering ----
+function ticket(j, { pos, r, action } = {}) {
+  const t = today();
+  const inShop = j.stage !== "booked" && j.stage !== "done" ? days(received(j), t) : null;
+  const bal = balance(j);
+  const chips = [];
+  if (r) chips.push(`<span class="chip ${r.cls}">${esc(r.why)}</span>`);
+  else if (j.rush && j.stage !== "done") chips.push(`<span class="chip rush">Rush</span>`);
+  if (j.example) chips.push(`<span class="chip soon">Example</span>`);
+  chips.push(`<span class="chip">${esc(label(TYPES, j.type))}</span>`);
+  const bits = [];
+  if (j.due && j.stage !== "done") bits.push(r ? r.dueTxt : "Due " + fmtD(j.due));
+  if (inShop !== null && j.stage !== "ready") bits.push(inShop === 0 ? "In today" : `In ${inShop}d`);
+  if (j.stage === "ready" && j.readyAt) { const w = days(j.readyAt, t); bits.push(w === 0 ? "Ready today" : `Waiting ${w}d`); }
+  if (j.stage === "booked" && j.appt?.at) bits.push(`${esc(j.appt.type || "Appt")} ${fmtT(j.appt.at)}`);
+  const qa = action ? `<button class="qa" data-action="advance" data-id="${j.id}" data-to="${action[0]}">${action[1]}</button>` : "";
+  return `<div class="ticket ${j.rush && j.stage !== "done" ? "rush" : ""}" role="button" tabindex="0" data-action="open" data-id="${j.id}">
+    <div class="stub"><span class="pos">${pos ?? "•"}</span><span class="num">#${j.num || "—"}</span></div>
+    <div class="body">
+      <div class="row1"><span class="name">${esc(j.client || "No name")}</span>
+        ${Number(j.price) ? `<span class="bal ${bal > 0.005 && (j.stage === "ready" || j.stage === "done") ? "owed" : ""}">${bal > 0.005 ? money(bal) + " due" : "Paid"}</span>` : ""}</div>
+      ${j.what ? `<div class="what">${esc(j.what)}</div>` : ""}
+      <div class="meta">${chips.join("")}<span>${bits.map(esc).join(" · ")}</span>${qa}</div>
+    </div></div>`;
+}
+
+function section(title, count, inner, hint) {
+  return `<section class="section"><h2>${title}${count != null ? ` <span class="count">${count}</span>` : ""}</h2>${hint ? `<p class="hint">${hint}</p>` : ""}${inner}</section>`;
+}
+const listOr = (items, emptyTxt) => items.length ? `<div class="list">${items.join("")}</div>` : `<div class="empty">${emptyTxt}</div>`;
+
+function viewWork() {
+  const j = S.jobs, t = today();
+  const weekOut = ymd(new Date(Date.now() + 7 * 864e5));
+  const coming = j.filter(x => x.stage !== "done" && x.appt?.at && x.appt.at.slice(0, 10) >= t && x.appt.at.slice(0, 10) <= weekOut)
+    .sort((a, b) => a.appt.at.localeCompare(b.appt.at));
+  const booked = j.filter(x => x.stage === "booked" && !coming.includes(x));
+  const working = queueOrder(j.filter(x => x.stage === "working"));
+  const queue = queueOrder(j.filter(x => x.stage === "queue"));
+  const ready = j.filter(x => x.stage === "ready").sort((a, b) => (a.readyAt || "").localeCompare(b.readyAt || ""));
+
+  const apptCard = x => {
+    const d = days(t, x.appt.at.slice(0, 10));
+    const when = d === 0 ? "Today" : d === 1 ? "Tomorrow" : fmtD(x.appt.at.slice(0, 10));
+    const time = x.appt.at.includes("T") ? fmtT(x.appt.at).split(" · ")[1] : "";
+    return ticket(x, { pos: `<span style="font-size:.78rem">${esc(when)}</span>`, r: { why: x.appt.type || "Appt", cls: "accent", dueTxt: time || "" } });
+  };
+  return [
+    exampleBanner(),
+    section("Next 7 days", coming.length, listOr(coming.map(apptCard), "No fittings, drop-offs or pickups on the books this week.")),
+    working.length ? section("On your table", working.length, listOr(working.map(({ j, r }) => ticket(j, { pos: "✂", r, action: ["ready", "Ready"] })), "")) : "",
+    section("Up next", queue.length, listOr(queue.map(({ j, r }, i) => ticket(j, { pos: i + 1, r, action: ["working", "Start"] })), "Nothing waiting. Jobs you mark <b>Dropped off</b> line up here."),
+      queue.length ? `Rush first, then anything due within ${SOON_DAYS} days, then first come, first served.` : ""),
+    section("Ready for pickup", ready.length, listOr(ready.map(x => ticket(x, { action: ["done", "Picked up"] })), "Nothing waiting on a pickup.")),
+    booked.length ? section("Booked, not dropped off yet", booked.length, listOr(booked.map(x => ticket(x, { action: ["queue", "Dropped off"] })), "")) : "",
+  ].join("");
+}
+
+function exampleBanner() {
+  if (!S.jobs.some(x => x.example)) return "";
+  return `<div class="banner"><span>These are example jobs so you can see how it works.</span><button class="btn" data-action="clear-examples">Remove examples</button></div>`;
+}
+
+function viewAll() {
+  const q = S.q.trim().toLowerCase();
+  let list = S.jobs.filter(x => S.filter === "all" || (S.filter === "active" ? x.stage !== "done" : x.stage === "done"));
+  if (q) list = list.filter(x => [x.client, x.phone, x.what, x.notes, String(x.num)].some(v => String(v || "").toLowerCase().includes(q)));
+  list.sort((a, b) => (b.num || 0) - (a.num || 0));
+  const f = (v, l) => `<button data-action="filter" data-v="${v}" aria-pressed="${S.filter === v}">${l}</button>`;
+  return `<section class="section"><h2>All jobs <span class="count">${list.length}</span></h2>
+    <input class="search" id="q" type="search" placeholder="Search name, phone, ticket #, notes" value="${esc(S.q)}">
+    <div class="seg">${f("active", "Open")}${f("done", "Picked up")}${f("all", "Everything")}</div>
+    ${listOr(list.map(x => ticket(x, { r: { why: label(STAGES, x.stage), cls: x.stage === "ready" ? "ok" : "", dueTxt: "" } })), q ? "No jobs match that search." : "No jobs here yet. Tap <b>+ New job</b> to add one.")}
+  </section>`;
+}
+
+function periodRange(p) {
+  const n = new Date(), t = today();
+  if (p === "month") return [ymd(new Date(n.getFullYear(), n.getMonth(), 1)), t, n.toLocaleDateString(undefined, { month: "long" })];
+  if (p === "last") { const a = new Date(n.getFullYear(), n.getMonth() - 1, 1), b = new Date(n.getFullYear(), n.getMonth(), 0); return [ymd(a), ymd(b), a.toLocaleDateString(undefined, { month: "long" })]; }
+  if (p === "year") return [`${n.getFullYear()}-01-01`, t, String(n.getFullYear())];
+  return ["0000-01-01", "9999-12-31", "All time"];
+}
+function allPayments() { return S.jobs.flatMap(j => (j.payments || []).map(p => ({ ...p, j }))); }
+
+function bars(rows, total) {
+  if (!rows.length) return `<div class="empty">No payments in this period.</div>`;
+  const max = Math.max(...rows.map(r => r[1]));
+  return `<div class="bars">${rows.map(([l, v, n]) => `<div class="bar"><span class="lab">${esc(l)}</span><span class="trk"><span class="fill" style="display:block;width:${max ? (v / max * 100).toFixed(1) : 0}%"></span></span><span class="amt">${money(v)} <small>${total ? Math.round(v / total * 100) + "%" : ""}</small></span></div>`).join("")}</div>`;
+}
+function groupSum(list, keyFn) {
+  const m = new Map();
+  for (const p of list) { const k = keyFn(p) || "Not set"; m.set(k, (m.get(k) || 0) + (Number(p.amount) || 0)); }
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function viewMoney() {
+  const [from, to, name] = periodRange(S.period);
+  const ps = allPayments().filter(p => p.date >= from && p.date <= to);
+  const total = ps.reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  const dep = ps.filter(p => p.kind === "deposit").reduce((a, p) => a + (Number(p.amount) || 0), 0);
+  const owed = S.jobs.filter(j => (j.stage === "ready" || j.stage === "done") && Number(j.price) && balance(j) > 0.005);
+  const owedSum = owed.reduce((a, j) => a + balance(j), 0);
+  const pending = S.jobs.filter(j => ["booked", "queue", "working"].includes(j.stage)).reduce((a, j) => a + Math.max(0, balance(j)), 0);
+  const p = (v, l) => `<button data-action="period" data-v="${v}" aria-pressed="${S.period === v}">${l}</button>`;
+  return `
+  <section class="section"><h2>Money</h2>
+    <div class="seg">${p("month", "This month")}${p("last", "Last month")}${p("year", "This year")}${p("all", "All time")}</div>
+    <div class="tiles">
+      <div class="tile big"><div class="k">Collected · ${esc(name)}</div><div class="v">${money(total)}</div><div class="sub">${ps.length} payment${ps.length === 1 ? "" : "s"} · ${money(dep)} in deposits, ${money(total - dep)} final</div></div>
+      <div class="tile"><div class="k">Owed on finished work</div><div class="v" style="color:${owedSum > 0 ? "var(--rush)" : "inherit"}">${money(owedSum)}</div></div>
+      <div class="tile"><div class="k">Still to collect on open jobs</div><div class="v">${money(pending)}</div></div>
+    </div>
+  </section>
+  ${section("How people paid", null, bars(groupSum(ps, x => x.method), total))}
+  ${section("By kind of work", null, bars(groupSum(ps, x => label(TYPES, x.j.type)), total))}
+  ${section("Where clients found you", null, bars(groupSum(ps, x => x.j.source), total), "Money collected, grouped by how each client heard about you.")}
+  ${owed.length ? section("Needs collecting", owed.length, listOr(owed.map(j => ticket(j, {})), "")) : ""}
+  <section class="section"><button class="btn" data-action="export">Save payments as a spreadsheet (CSV)</button>
+  <p class="hint">Exports every payment in the period above, for your records or taxes.</p></section>`;
+}
+
+function render() {
+  const app = document.getElementById("app");
+  const head = `<header class="top"><div><h1>Sew Much More</h1><div class="sub">${new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}</div></div></header>`;
+  let body;
+  if (S.offline) body = `<div class="banner err">Your jobs couldn't load in this view. Open this page in the Claude app or at claude.ai while signed in.</div>`;
+  else if (!S.loaded) body = `<div class="empty">Loading your jobs…</div>`;
+  else body = S.tab === "work" ? viewWork() : S.tab === "money" ? viewMoney() : viewAll();
+  const qFocused = document.activeElement?.id === "q";
+  const caret = qFocused ? document.activeElement.selectionStart : null;
+  app.innerHTML = head + body;
+  if (qFocused) { const q = document.getElementById("q"); q.focus(); try { q.setSelectionRange(caret, caret); } catch {} }
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-current", b.dataset.tab === S.tab ? "page" : "false"));
+  document.getElementById("fab").hidden = S.offline || !S.loaded;
+}
+
+// ---- sheet (new / edit) ----
+function blankJob() {
+  const nums = S.jobs.map(j => j.num || 0);
+  return { num: (nums.length ? Math.max(...nums) : 100) + 1, client: "", phone: "", type: "everyday", what: "", stage: "queue", received: today(), due: "", rush: false,
+    appt: { type: "Fitting", at: "" }, price: "", payments: [], source: "", measurements: {}, notes: "", createdAt: new Date().toISOString() };
+}
+function openSheet(job) {
+  S.draft = structuredClone(job);
+  S.draft.appt ||= { type: "Fitting", at: "" };
+  S.draft.payments ||= [];
+  S.draft.measurements ||= {};
+  S.armed = false;
+  S.newPay = { amount: "", method: "Cash", kind: S.draft.payments.length ? "final" : "deposit", date: today() };
+  renderSheet();
+}
+function closeSheet() { S.draft = null; document.getElementById("sheet-root").innerHTML = ""; }
+
+function chipsField(name, list, val, multiline) {
+  return `<div class="seg" role="group">${list.map(([v, l]) => `<button type="button" data-action="pick" data-f="${name}" data-v="${esc(v)}" aria-pressed="${val === v}">${esc(l)}</button>`).join("")}</div>`;
+}
+function renderSheet() {
+  const d = S.draft; if (!d) return;
+  const isNew = !d.id;
+  const pd = paid(d), bal = (Number(d.price) || 0) - pd;
+  const scroll = document.querySelector(".sheet")?.scrollTop || 0;
+  const np = S.newPay;
+  document.getElementById("sheet-root").innerHTML = `
+  <div class="scrim" data-action="scrim"><form class="sheet" id="sheet" role="dialog" aria-label="${isNew ? "New job" : "Job " + d.num}" autocomplete="off">
+    <div class="sheet-head"><h2>${isNew ? "New job" : esc(d.client || "Job")} <span class="count">#${d.num}</span></h2>
+      <div style="display:flex;gap:8px"><button type="button" class="btn" data-action="close">Cancel</button><button type="submit" class="btn primary">Save</button></div></div>
+
+    <div class="two">
+      <div class="field"><label for="f-client">Client</label><input id="f-client" type="text" data-f="client" value="${esc(d.client)}" placeholder="Name" required></div>
+      <div class="field"><label for="f-phone">Phone</label><input id="f-phone" type="tel" data-f="phone" value="${esc(d.phone)}" placeholder="Optional"></div>
+    </div>
+    <div class="field"><span class="lbl">Kind of work</span>${chipsField("type", TYPES, d.type)}</div>
+    <div class="field"><label for="f-what">What needs doing</label><textarea id="f-what" data-f="what" placeholder="e.g. Hem 2 pants, replace jacket button">${esc(d.what)}</textarea></div>
+
+    <div class="field"><span class="lbl">Where it's at</span>${chipsField("stage", STAGES, d.stage)}</div>
+    <div class="two">
+      <div class="field"><label for="f-received">Dropped off</label><input id="f-received" type="date" data-f="received" value="${esc(d.received || "")}"></div>
+      <div class="field"><label for="f-due">Due</label><input id="f-due" type="date" data-f="due" value="${esc(d.due || "")}"></div>
+    </div>
+    <label class="toggle"><input id="f-rush" type="checkbox" data-f="rush" ${d.rush ? "checked" : ""}> Rush order (jumps to the top)</label>
+
+    <div class="card"><h3>Next appointment</h3>
+      ${chipsField("appt.type", APPTS.map(a => [a, a]), d.appt.type)}
+      <div class="field"><label for="f-appt">Date and time</label><input id="f-appt" type="datetime-local" data-f="appt.at" value="${esc(d.appt.at || "")}"></div>
+      ${d.appt.at ? `<button type="button" class="btn" data-action="clear-appt" style="align-self:flex-start">Clear appointment</button>` : ""}
+    </div>
+
+    ${d.type === "custom" ? `<div class="card"><h3>Measurements</h3><div class="meas">${MEAS.map(m => `<div class="field"><label for="m-${m}">${m}</label><input id="m-${m}" type="text" data-f="measurements.${m}" value="${esc(d.measurements[m] || "")}" inputmode="decimal"></div>`).join("")}</div>
+      <div class="field"><label for="m-other">Other measurements</label><textarea id="m-other" data-f="measurements.Other">${esc(d.measurements.Other || "")}</textarea></div></div>` : ""}
+
+    <div class="card"><h3>Payment</h3>
+      <div class="field"><label for="f-price">Total price</label><input id="f-price" type="number" step="0.01" min="0" inputmode="decimal" data-f="price" value="${esc(d.price)}" placeholder="0"></div>
+      ${d.payments.length ? `<div>${d.payments.map((p, i) => `<div class="pay"><span>${fmtD(p.date)} · ${esc(p.method)} · ${p.kind === "deposit" ? "Deposit" : "Payment"}</span><span style="display:flex;gap:4px;align-items:center"><b>${money(p.amount)}</b><button type="button" class="x" data-action="rm-pay" data-i="${i}" aria-label="Remove payment">✕</button></span></div>`).join("")}</div>` : ""}
+      <div class="sumrow"><span>Paid ${money(pd)}</span><span style="color:${bal > 0.005 ? "var(--rush)" : "var(--ok)"}">${Number(d.price) ? (bal > 0.005 ? money(bal) + " left" : "Paid in full") : ""}</span></div>
+      <div class="field"><span class="lbl">Record a payment</span>
+        <div class="two"><input id="p-amount" type="number" step="0.01" min="0" inputmode="decimal" data-p="amount" value="${esc(np.amount)}" placeholder="Amount" aria-label="Amount">
+        <input id="p-date" type="date" data-p="date" value="${esc(np.date)}" aria-label="Payment date"></div>
+        <div class="seg">${METHODS.map(m => `<button type="button" data-action="pick-pay" data-f="method" data-v="${m}" aria-pressed="${np.method === m}">${m}</button>`).join("")}</div>
+        <div class="seg">${[["deposit", "Deposit"], ["final", "Final / balance"]].map(([v, l]) => `<button type="button" data-action="pick-pay" data-f="kind" data-v="${v}" aria-pressed="${np.kind === v}">${l}</button>`).join("")}</div>
+        <button type="button" class="btn" data-action="add-pay" style="align-self:flex-start">Add payment</button>
+      </div>
+    </div>
+
+    <div class="field"><span class="lbl">How they found you</span>${chipsField("source", SOURCES.map(s => [s, s]), d.source)}</div>
+    <div class="field"><label for="f-notes">Notes</label><textarea id="f-notes" data-f="notes" placeholder="Anything to remember">${esc(d.notes)}</textarea></div>
+
+    <div class="actions">
+      ${isNew ? "<span></span>" : `<button type="button" class="btn danger ${S.armed ? "armed" : ""}" data-action="delete">${S.armed ? "Tap again to delete" : "Delete job"}</button>`}
+      <button type="submit" class="btn primary">Save</button>
+    </div>
+  </form></div>`;
+  const sh = document.querySelector(".sheet"); if (sh) sh.scrollTop = scroll;
+}
+
+function setPath(obj, path, val) { const k = path.split("."); let o = obj; while (k.length > 1) { const x = k.shift(); o[x] ||= {}; o = o[x]; } o[k[0]] = val; }
+
+function normalize(j) {
+  const t = today();
+  if (j.stage !== "booked" && !j.received) j.received = t;
+  if (j.stage === "ready" && !j.readyAt) j.readyAt = t;
+  if (j.stage !== "ready" && j.stage !== "done") delete j.readyAt;
+  if (j.stage === "done" && !j.doneAt) j.doneAt = t;
+  if (j.stage !== "done") delete j.doneAt;
+  j.price = j.price === "" || j.price == null ? "" : Number(j.price);
+  if (j.type !== "custom") j.measurements = Object.fromEntries(Object.entries(j.measurements || {}).filter(([, v]) => v));
+  j.updatedAt = new Date().toISOString();
+  return j;
+}
+
+async function saveJob(j) {
+  if (!S.db) return toast("Not connected, nothing saved");
+  const { id, ...data } = normalize(j);
+  try { await S.db.collection("jobs").doc(id || undefined).set(data); return true; }
+  catch (e) { toast(e.code === "quota_exceeded" ? "Storage is full. Delete old jobs to make room." : "Couldn't save. Check your connection and try again."); return false; }
+}
+
+// ---- events ----
+document.addEventListener("click", async e => {
+  const t = e.target.closest("[data-action],[data-tab]");
+  if (!t) return;
+  if (t.dataset.tab) { S.tab = t.dataset.tab; render(); window.scrollTo(0, 0); return; }
+  const a = t.dataset.action;
+  if (a === "scrim" && e.target !== t) return;
+  if (a === "advance") e.stopPropagation();
+  switch (a) {
+    case "new": openSheet(blankJob()); break;
+    case "open": { const j = S.jobs.find(x => x.id === t.dataset.id); if (j) openSheet(j); break; }
+    case "close": case "scrim": closeSheet(); break;
+    case "pick": { const f = t.dataset.f, v = t.dataset.v; const cur = f.split(".").reduce((o, k) => o?.[k], S.draft); setPath(S.draft, f, (f === "source" && cur === v) ? "" : v); renderSheet(); break; }
+    case "pick-pay": S.newPay[t.dataset.f] = t.dataset.v; renderSheet(); break;
+    case "add-pay": {
+      const amt = Number(S.newPay.amount);
+      if (!amt || amt <= 0) { toast("Enter the amount first"); document.getElementById("p-amount")?.focus(); break; }
+      S.draft.payments.push({ amount: amt, method: S.newPay.method, kind: S.newPay.kind, date: S.newPay.date || today() });
+      S.newPay = { ...S.newPay, amount: "", kind: "final" }; renderSheet(); break;
+    }
+    case "rm-pay": S.draft.payments.splice(Number(t.dataset.i), 1); renderSheet(); break;
+    case "clear-appt": S.draft.appt.at = ""; renderSheet(); break;
+    case "delete":
+      if (!S.armed) { S.armed = true; renderSheet(); break; }
+      try { await S.db.collection("jobs").doc(S.draft.id).delete(); closeSheet(); toast("Job deleted"); } catch { toast("Couldn't delete. Try again."); }
+      break;
+    case "advance": {
+      const j = S.jobs.find(x => x.id === t.dataset.id); if (!j) break;
+      const to = t.dataset.to;
+      if (to === "done" && Number(j.price) && balance(j) > 0.005) { openSheet({ ...j, stage: "done" }); toast(`${money(balance(j))} still owed. Record the payment, then Save.`); break; }
+      const n = structuredClone(j); n.stage = to;
+      if (await saveJob(n)) toast(`Moved to ${label(STAGES, to)}`);
+      break;
+    }
+    case "filter": S.filter = t.dataset.v; render(); break;
+    case "period": S.period = t.dataset.v; render(); break;
+    case "clear-examples": {
+      for (const j of S.jobs.filter(x => x.example)) { try { await S.db.collection("jobs").doc(j.id).delete(); } catch {} }
+      toast("Examples removed"); break;
+    }
+    case "export": exportCsv(); break;
+  }
+});
+document.addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.(".ticket")) { e.preventDefault(); e.target.click(); }
+  if (e.key === "Escape" && S.draft) closeSheet();
+});
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (el.id === "q") { S.q = el.value; render(); return; }
+  if (!S.draft) return;
+  if (el.dataset.f) setPath(S.draft, el.dataset.f, el.type === "checkbox" ? el.checked : el.value);
+  if (el.dataset.p) S.newPay[el.dataset.p] = el.value;
+  if (el.id === "f-price") { /* refresh balance line without losing focus */ const r = document.querySelector(".sumrow"); if (r) { const pd = paid(S.draft), b = (Number(S.draft.price) || 0) - pd; r.lastElementChild.textContent = Number(S.draft.price) ? (b > 0.005 ? money(b) + " left" : "Paid in full") : ""; } }
+});
+document.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!S.draft) return;
+  if (!S.draft.client.trim()) { toast("Add the client's name"); document.getElementById("f-client")?.focus(); return; }
+  if (Number(S.newPay.amount) > 0) { toast("Tap Add payment first, or clear the amount"); return; }
+  const isNew = !S.draft.id;
+  if (await saveJob(S.draft)) { closeSheet(); toast(isNew ? `Ticket #${S.draft.num} added` : "Saved"); }
+});
+
+let toastTimer;
+function toast(msg) {
+  const r = document.getElementById("toast-root");
+  r.innerHTML = `<div class="toast" role="status">${esc(msg)}</div>`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => r.innerHTML = "", 2600);
+}
+
+async function exportCsv() {
+  const [from, to, name] = periodRange(S.period);
+  const ps = allPayments().filter(p => p.date >= from && p.date <= to).sort((a, b) => a.date.localeCompare(b.date));
+  if (!ps.length) return toast("No payments in this period");
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const rows = [["Date", "Ticket", "Client", "Kind of work", "Method", "Deposit or final", "Amount", "Found you via"].map(q).join(",")]
+    .concat(ps.map(p => [p.date, p.j.num, p.j.client, label(TYPES, p.j.type), p.method, p.kind === "deposit" ? "Deposit" : "Final", Number(p.amount).toFixed(2), p.j.source].map(q).join(",")));
+  if (!S.downloads) return toast("Saving files isn't available here");
+  try { await S.downloads.save({ filename: `sew-much-more-payments-${name.replace(/\s+/g, "-").toLowerCase()}.csv`, data: rows.join("\n") }); }
+  catch (e) { if (e.code !== "declined") toast("Couldn't save the file here"); }
+}
+
+// ---- boot ----
+render();
+(async () => {
+  const c = window.claude;
+  if (!c?.use) { S.offline = true; render(); return; }
+  const [db, dl] = await Promise.all([c.use("db"), c.use("downloads")]);
+  S.downloads = dl;
+  if (!db) { S.offline = true; render(); return; }
+  S.db = db;
+  db.collection("jobs").onSnapshot(snap => {
+    S.jobs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    S.loaded = true; render();
+  }, () => { S.offline = true; render(); });
+})();
+</script>
